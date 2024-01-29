@@ -69,8 +69,13 @@ function applyColorBasedOnTime() {
 // Set the time blocks to appear--//
 // -------------------------------//
 // Let user set their working day to populate this variable
+
 function generateHoursArray() {
-  // Prompt the user for the start and end hours
+  /** The function `generateHoursArray` prompts the user for a start and end hour,
+   * validates the input,and generates an array of hours between the start and end.
+   * returns an array of hours between the start and end hours provided by the user.
+   */
+
   const startHour = parseInt(prompt("Enter the start hour (00-24hr):"), 10);
   const endHour = parseInt(prompt("Enter the end hour (00-24hr):"), 10);
 

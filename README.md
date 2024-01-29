@@ -2,6 +2,8 @@
 
 Welcome to the Planner App, a simple and flexible JavaScript-based application to help you organize your day effectively. This app allows users to set their working hours, create and store notes for each hour, and visualize their schedule color-coded by past, present, and future.
 
+[Open The App](drwho1369.github.io/personalPlannerApp/)
+
 ## Features
 
 1. **Dynamic Time Block Creation:** The app dynamically generates time blocks based on the user's defined working hours, providing a personalized scheduling experience.

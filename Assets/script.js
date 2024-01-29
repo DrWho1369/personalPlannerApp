@@ -32,11 +32,51 @@ function getDayWithSuffix(day) {
   return day + suffix;
 }
 
-const currentDay = dayjs().format("D");
-const dayWithSuffix = getDayWithSuffix(parseInt(currentDay, 10));
-const currentDate = dayjs().format("dddd, MMMM");
-const formattedDate = currentDate + " " + dayWithSuffix;
-$(currentDayEl).text(formattedDate);
+// -------------------------------//
+// Set the time elements to appear--//
+// -------------------------------//
+// Let user set their working day to populate this variable
+
+function generateOrRetrieveHoursArray() {
+  // Check if the user has already visited the site and a choice is stored in local storage
+  const storedHours = localStorage.getItem("userHoursChoice");
+
+  if (storedHours) {
+    // Retrieve the stored array choice from local storage
+    return JSON.parse(storedHours);
+  }
+
+  // Prompt the user for the start and end hours
+  const startHour = parseInt(prompt("Enter the start hour (00-24):"), 10);
+  const endHour = parseInt(prompt("Enter the end hour (00-24):"), 10);
+
+  // Validate input
+  if (
+    isNaN(startHour) ||
+    isNaN(endHour) ||
+    startHour < 0 ||
+    startHour > 24 ||
+    endHour < 0 ||
+    endHour > 24 ||
+    startHour >= endHour
+  ) {
+    alert(
+      "Invalid input. Please enter valid start and end hours between 00 and 24."
+    );
+    return [];
+  }
+
+  // Generate the array of hours between start and end
+  const generatedHours = [];
+  for (let hour = startHour; hour <= endHour; hour++) {
+    generatedHours.push(hour);
+  }
+
+  // Store the user's array choice in local storage
+  localStorage.setItem("userHoursChoice", JSON.stringify(generatedHours));
+
+  return generatedHours;
+}
 
 // -------------------------------//
 // Applying colors to time blocks-//
@@ -47,7 +87,7 @@ function applyColorBasedOnTime() {
    * based on the current hour.*/
   const currentTime = currentDay.hour(); // Get the current hour
 
-  $(".time-block").each(function (i, block) {
+  $(".time-element").each(function (i, block) {
     const blockHour = hours[i];
 
     // Apply different classes based on the comparison with the current hour
@@ -66,49 +106,17 @@ function applyColorBasedOnTime() {
 }
 
 // -------------------------------//
-// Set the time blocks to appear--//
+// Return from local storage------//
 // -------------------------------//
-// Let user set their working day to populate this variable
+function assignStoredText() {
+  const timeBlocks = $(".time-element");
 
-function generateHoursArray() {
-  /** The function `generateHoursArray` prompts the user for a start and end hour,
-   * validates the input,and generates an array of hours between the start and end.
-   * returns an array of hours between the start and end hours provided by the user.
-   */
-
-  const startHour = parseInt(prompt("Enter the start hour (00-24hr):"), 10);
-  const endHour = parseInt(prompt("Enter the end hour (00-24hr):"), 10);
-
-  // Validate input
-  if (
-    isNaN(startHour) ||
-    isNaN(endHour) ||
-    startHour < 0 ||
-    startHour > 24 ||
-    endHour < 0 ||
-    endHour > 24 ||
-    startHour >= endHour
-  ) {
-    alert("Invalid input. Please enter valid start and end hours.");
-    return [];
-  }
-
-  // Generate the array of hours between start and end
-  const generatedHours = [];
-  for (let hour = startHour; hour <= endHour; hour++) {
-    generatedHours.push(hour);
-  }
-
-  return generatedHours;
-}
-
-const hours = generateHoursArray();
-
-for (let i = 0; i < hours.length; i++) {
-  var newDiv = $(
-    `<form><div class='row time-block'><div class='col-2 hour'>${hours[i]}:00</div><textarea class='col-8 description textInput' name='textInput'></textarea><button class='col-2 saveBtn' type='submit'><i class='fas fa-save'></i></button></div></form>`
-  );
-  containerEl.append(newDiv);
+  timeBlocks.each(function (index, block) {
+    const hour = $(block).find(".hour").text();
+    const storedText = localStorage.getItem(`savedData ${hourForLocalStorage}`);
+    const textarea = $(block).find("textarea[name='textInput']");
+    textarea.val(storedText);
+  });
 }
 
 // -------------------------------//
@@ -135,4 +143,20 @@ $(document).on("submit", "form", function (event) {
 // Call any functions required----//
 // -------------------------------//
 
+const currentDay = dayjs().format("D");
+const dayWithSuffix = getDayWithSuffix(parseInt(currentDay, 10));
+const currentDate = dayjs().format("dddd, MMMM");
+const formattedDate = currentDate + " " + dayWithSuffix;
+$(currentDayEl).text(formattedDate);
+
+const hours = generateOrRetrieveHoursArray();
+
+for (let i = 0; i < hours.length; i++) {
+  var newDiv = $(
+    `<form><div class='row time-element'><div class='col-2 hour'>${hours[i]}:00</div><textarea class='col-8 description textInput' name='textInput'></textarea><button class='col-2 saveBtn' type='submit'><i class='fas fa-save'></i></button></div></form>`
+  );
+  containerEl.append(newDiv);
+}
+
+assignStoredText();
 applyColorBasedOnTime();

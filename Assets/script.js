@@ -39,10 +39,65 @@ const formattedDate = currentDate + " " + dayWithSuffix;
 $(currentDayEl).text(formattedDate);
 
 // -------------------------------//
+// Applying colors to time blocks-//
+// -------------------------------//
+
+function applyColorBasedOnTime() {
+  /*** The function applies different classes to time blocks
+   * based on the current hour.*/
+  const currentTime = currentDay.hour(); // Get the current hour
+
+  $(".time-block").each(function (i, block) {
+    const blockHour = hours[i];
+
+    // Apply different classes based on the comparison with the current hour
+    switch (true) {
+      case blockHour < currentTime:
+        $(this).addClass("past");
+        break;
+      case blockHour === currentTime:
+        $(this).addClass("present");
+        break;
+      case blockHour > currentTime:
+        $(this).addClass("future");
+        break;
+    }
+  });
+}
+
+// -------------------------------//
 // Set the time blocks to appear--//
 // -------------------------------//
-var hours = [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
 // Let user set their working day to populate this variable
+function generateHoursArray() {
+  // Prompt the user for the start and end hours
+  const startHour = parseInt(prompt("Enter the start hour (00-24hr):"), 10);
+  const endHour = parseInt(prompt("Enter the end hour (00-24hr):"), 10);
+
+  // Validate input
+  if (
+    isNaN(startHour) ||
+    isNaN(endHour) ||
+    startHour < 0 ||
+    startHour > 24 ||
+    endHour < 0 ||
+    endHour > 24 ||
+    startHour >= endHour
+  ) {
+    alert("Invalid input. Please enter valid start and end hours.");
+    return [];
+  }
+
+  // Generate the array of hours between start and end
+  const generatedHours = [];
+  for (let hour = startHour; hour <= endHour; hour++) {
+    generatedHours.push(hour);
+  }
+
+  return generatedHours;
+}
+
+const hours = generateHoursArray();
 
 for (let i = 0; i < hours.length; i++) {
   var newDiv = $(
@@ -50,3 +105,29 @@ for (let i = 0; i < hours.length; i++) {
   );
   containerEl.append(newDiv);
 }
+
+// -------------------------------//
+// Set to store to local storage--//
+// -------------------------------//
+$(document).on("submit", "form", function (event) {
+  event.preventDefault();
+
+  // Extract values from the form
+  const form = $(event.target);
+  const textInput = form.find("textarea[name='textInput']").val().trim();
+  const hourForLocalStorage = form.find(".hour").text();
+
+  // Construct the localStorage key
+  const localStorageKey = `savedData ${hourForLocalStorage}`;
+
+  // Update or set new value in localStorage
+  localStorage.setItem(localStorageKey, textInput);
+
+  console.log(textInput, hourForLocalStorage); // Log to check working
+});
+
+// -------------------------------//
+// Call any functions required----//
+// -------------------------------//
+
+applyColorBasedOnTime();
